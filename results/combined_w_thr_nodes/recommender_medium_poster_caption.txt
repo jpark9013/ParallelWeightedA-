@@ -1,0 +1,6 @@
+Poster caption — copy beside or below figures
+
+Dataset: Geom recommender medium n=10^9 (k=64, 512 candidates)
+MPI ranks = nodes (1, 2); efficiency uses wall time at nodes=1 as T₁ per series.
+
+Figures: *_poster_time_faceted.jpg uses separate linear y axes from 0 s per w panel. *_poster_efficiency.jpg shows η = T₁/(N·T_N) with η = 1 as ideal strong scaling.

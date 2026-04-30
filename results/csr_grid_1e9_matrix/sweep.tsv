@@ -1,0 +1,6 @@
+graph	mode	path	nodes	w	threads	time_s	exit_code	expansions	cost
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	1	1	199.969190	0	999999998	69998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	1	8	204.385365	0	999999998	69998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	5	1	0.019760	0	69998	69998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	5	8	0.020810	0	69998	69998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	2	1	1	NA	143	NA	NA

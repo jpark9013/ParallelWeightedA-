@@ -4,6 +4,7 @@
 #include <limits>
 #include <optional>
 #include <queue>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -18,7 +19,10 @@ struct AstarOutcome {
 
 template <typename Graph>
 AstarOutcome<Graph> astar_lazy(const Graph& graph, uint64_t start, uint64_t goal,
-                               uint64_t max_expansions = UINT64_MAX) {
+                               uint64_t max_expansions = UINT64_MAX, double h_weight = 1.0) {
+  if (!(h_weight > 0.0) || std::isnan(h_weight) || std::isinf(h_weight)) {
+    throw std::runtime_error("astar_lazy: h_weight must be finite and > 0");
+  }
   struct Node {
     double f;
     double g;
@@ -48,7 +52,7 @@ AstarOutcome<Graph> astar_lazy(const Graph& graph, uint64_t start, uint64_t goal
   }
 
   gbest[start] = 0.0;
-  open.push({h(start), 0.0, start});
+  open.push({h_weight * h(start), 0.0, start});
 
   while (!open.empty() && out.expansions < max_expansions) {
     Node cur = open.top();
@@ -67,7 +71,7 @@ AstarOutcome<Graph> astar_lazy(const Graph& graph, uint64_t start, uint64_t goal
       auto it = gbest.find(to);
       if (it != gbest.end() && !(tg < it->second)) continue;
       gbest[to] = tg;
-      double f = tg + h(to);
+      double f = tg + h_weight * h(to);
       open.push({f, tg, to});
     }
   }

@@ -1,0 +1,13 @@
+graph	nodes	w	threads	time_s	exit_code	expansions
+recommender_medium	1	1	1	249.843764	0	10905493
+recommender_medium	1	5	1	241.562103	0	10731421
+recommender_medium	2	1	1	148.492651	0	10906240
+recommender_medium	2	5	1	139.442005	0	10222660
+recommender_medium	4	1	1	80.412906	0	10902144
+recommender_medium	4	5	1	55.714085	0	7325824
+social_embedding_dense	1	1	1	164.072509	0	3407796
+social_embedding_dense	1	5	1	319.321247	0	7859800
+social_embedding_dense	2	1	1	97.834282	0	3407488
+social_embedding_dense	2	5	1	163.450533	0	6528059
+social_embedding_dense	4	1	1	51.021701	0	3406464
+social_embedding_dense	4	5	1	61.182847	0	4337792

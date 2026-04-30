@@ -1,0 +1,17 @@
+graph	mode	spec	nodes	w	threads	time_s	exit_code	expansions
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	1	1	201.510325	0	999999998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	1	8	202.553956	0	999999998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	5	1	0.023378	0	69998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	1	5	8	0.019728	0	69998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	2	1	1	150.152480	0	999999998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	2	1	8	187.408461	0	999999998
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	2	5	1	0.039925	0	80143
+grid_1e9_sparse	grid	bench_specs/grid_1e9_sparse.spec	2	5	8	0.039683	0	80143
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	1	1	1	250.556989	0	10905493
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	1	1	8	316.706961	0	10905493
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	1	5	1	241.064090	0	10731421
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	1	5	8	304.708389	0	10731421
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	2	1	1	148.927650	0	10906240
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	2	1	8	199.086895	0	10906240
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	2	5	1	139.752574	0	10222660
+recommender_medium	geom	bench_specs/geom_1e9_recommender_medium.spec	2	5	8	184.859494	0	10222660

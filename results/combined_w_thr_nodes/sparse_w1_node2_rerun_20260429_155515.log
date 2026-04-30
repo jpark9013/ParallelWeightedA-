@@ -1,0 +1,11 @@
+=== 2026-04-29T15:55:15-07:00 threads=1 cpus=1 ===
+error: std::bad_alloc
+MPICH ERROR [Rank 0] [job id 52232420.0] [Wed Apr 29 15:58:32 2026] [nid004248] - Abort(2) (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 2) - process 0
+
+aborting job:
+application called MPI_Abort(MPI_COMM_WORLD, 2) - process 0
+srun: error: nid004248: task 0: Exited with exit code 255
+srun: Terminating StepId=52232420.0
+srun: error: nid006866: task 1: Terminated
+srun: Force Terminated StepId=52232420.0
+RESULT threads=1 cpus=1 rc=143 time_s=NA expansions=NA

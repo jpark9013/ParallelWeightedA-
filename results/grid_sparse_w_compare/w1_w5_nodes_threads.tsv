@@ -1,0 +1,13 @@
+graph	nodes	w	threads	time_s	exit_code	expansions
+grid_1e9_sparse	1	1	1	203.110161	0	999999998
+grid_1e9_sparse	1	5	1	0.024465	0	69998
+grid_1e9_sparse	2	1	1	NA	143	NA
+grid_1e9_sparse	2	5	1	0.040880	0	80143
+grid_1e9_sparse	4	1	1	NA	143	NA
+grid_1e9_sparse	4	5	1	0.046846	0	100999
+grid_1e9_sparse	1	1	8	201.706108	0	999999998
+grid_1e9_sparse	1	5	8	0.069205	0	69998
+grid_1e9_sparse	2	1	8	NA	143	NA
+grid_1e9_sparse	2	5	8	0.053336	0	80143
+grid_1e9_sparse	4	1	8	220.032088	0	999999998
+grid_1e9_sparse	4	5	8	96.546386	0	100999

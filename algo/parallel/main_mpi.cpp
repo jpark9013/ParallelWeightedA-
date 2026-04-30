@@ -22,6 +22,7 @@
 
 #include "astar_lazy.hpp"
 #include "csr_graph.hpp"
+#include "dary_heap.hpp"
 #include "geom_implicit.hpp"
 #include "grid_implicit.hpp"
 
@@ -40,10 +41,14 @@ static void usage(const char* argv0) {
   std::fprintf(stderr,
                "Hybrid MPI+OpenMP Hash-Distributed A* (superstep).\n"
                "Usage:\n"
-               "  %s --mode csr   --edges PATH --start U --goal V [--budget B] [--max-supersteps S]\n"
-               "  %s --mode grid  --spec  PATH --start U --goal V [--budget B] [--max-supersteps S]\n"
-               "  %s --mode geom  --spec  PATH --start U --goal V [--budget B] [--max-supersteps S]\n"
+               "  %s --mode csr   --edges PATH --start U --goal V [-w W] [--budget B] [--max-supersteps S]\n"
+               "  %s --mode grid  --spec  PATH --start U --goal V [-w W] [--budget B] [--max-supersteps S]\n"
+               "  %s --mode geom  --spec  PATH --start U --goal V [-w W] [--budget B] [--max-supersteps S]\n"
+               "Optional:\n"
+               "  --heap  stl|4ary            (default: stl)\n"
+               "  --inbox critical|localpq    (default: critical)\n"
                "Notes:\n"
+               "  - Weighted A*: priority uses f = g + W*h (default W=1). CSR uses h=0, so W has no effect.\n"
                "  - OpenMP is used for neighbor aggregation (CSR) and applying inbound messages.\n"
                "  - For a correctness baseline on 1 MPI rank, results should match the serial binary.\n"
                "  - With multiple ranks, search order differs from textbook serial A* (distributed work).\n",
@@ -56,6 +61,50 @@ static uint64_t parse_u64(const char* s) {
   if (!end || *end) throw std::runtime_error(std::string("bad uint64: ") + s);
   return static_cast<uint64_t>(v);
 }
+
+static double parse_double_arg(const char* s) {
+  char* end = nullptr;
+  double v = std::strtod(s, &end);
+  if (!end || *end) throw std::runtime_error(std::string("bad double: ") + s);
+  return v;
+}
+
+static inline size_t round_up64(size_t n) { return (n + 63u) & ~63u; }
+
+struct AlignedBuf {
+  void* p = nullptr;
+  size_t n = 0;
+
+  AlignedBuf() = default;
+  explicit AlignedBuf(size_t bytes) { reset(bytes); }
+  AlignedBuf(const AlignedBuf&) = delete;
+  AlignedBuf& operator=(const AlignedBuf&) = delete;
+  AlignedBuf(AlignedBuf&& o) noexcept : p(o.p), n(o.n) { o.p = nullptr; o.n = 0; }
+  AlignedBuf& operator=(AlignedBuf&& o) noexcept {
+    if (this != &o) {
+      reset(0);
+      p = o.p;
+      n = o.n;
+      o.p = nullptr;
+      o.n = 0;
+    }
+    return *this;
+  }
+  ~AlignedBuf() { reset(0); }
+
+  void reset(size_t bytes) {
+    if (p) std::free(p);
+    p = nullptr;
+    n = 0;
+    if (bytes == 0) return;
+    size_t want = round_up64(bytes);
+    p = std::aligned_alloc(64, want);
+    if (!p) throw std::bad_alloc();
+    n = want;
+  }
+  char* data() { return static_cast<char*>(p); }
+  const char* data() const { return static_cast<const char*>(p); }
+};
 
 struct GraphHolder {
   GraphMode mode = GraphMode::Csr;
@@ -115,13 +164,34 @@ struct DistState {
   uint64_t goal = 0;
   int budget = 128;
   uint64_t max_supersteps = 50000000ULL;
+  double h_weight = 1.0;
 
   GraphHolder gh;
   uint64_t n_total = 0;
+  uint64_t expansion_total = 0;
 
   // Min-heap on (f,g,v) using lexicographic std::greater<std::tuple<...>>.
   using OpenEl = std::tuple<double, double, uint64_t>;
-  std::priority_queue<OpenEl, std::vector<OpenEl>, std::greater<OpenEl>> open;
+  enum class HeapMode { Stl, Dary4 };
+  enum class InboxMode { Critical, LocalPQMerge };
+
+  struct OpenQueue {
+    HeapMode mode = HeapMode::Stl;
+    std::priority_queue<OpenEl, std::vector<OpenEl>, std::greater<OpenEl>> stl;
+    algo::DaryHeap<OpenEl, 4, std::greater<OpenEl>> d4;
+
+    explicit OpenQueue(HeapMode m = HeapMode::Stl) : mode(m), stl(), d4(std::greater<OpenEl>()) {}
+
+    bool empty() const { return mode == HeapMode::Stl ? stl.empty() : d4.empty(); }
+    const OpenEl& top() const { return mode == HeapMode::Stl ? stl.top() : d4.top(); }
+    void pop() { mode == HeapMode::Stl ? stl.pop() : d4.pop(); }
+    void push(const OpenEl& e) { mode == HeapMode::Stl ? stl.push(e) : d4.push(e); }
+    void emplace(double f, double g, uint64_t v) { mode == HeapMode::Stl ? stl.emplace(f, g, v) : d4.emplace(f, g, v); }
+  };
+
+  HeapMode heap_mode = HeapMode::Stl;
+  InboxMode inbox_mode = InboxMode::Critical;
+  OpenQueue open;
 
   std::unordered_map<uint64_t, double> gbest;
 
@@ -132,8 +202,20 @@ struct DistState {
   double found_cost = std::numeric_limits<double>::infinity();
   uint64_t superstep = 0;
 
-  DistState(int r, int n, GraphHolder&& g, uint64_t gl, int bud, uint64_t maxss)
-      : rank(r), nranks(n), goal(gl), budget(bud), max_supersteps(maxss), gh(std::move(g)) {
+  DistState(int r, int n, GraphHolder&& g, uint64_t gl, int bud, uint64_t maxss, double hw, HeapMode hm, InboxMode im)
+      : rank(r),
+        nranks(n),
+        goal(gl),
+        budget(bud),
+        max_supersteps(maxss),
+        h_weight(hw),
+        heap_mode(hm),
+        inbox_mode(im),
+        open(hm),
+        gh(std::move(g)) {
+    if (!(h_weight > 0.0) || std::isnan(h_weight) || std::isinf(h_weight)) {
+      throw std::runtime_error("h_weight (-w) must be finite and > 0");
+    }
     mail.assign((size_t)nranks, {});
     gbest.reserve(1024);
     nbr.reserve(4096);
@@ -188,7 +270,7 @@ struct DistState {
       for (auto [to, w] : nbr) {
         if (!(w >= 0.0) || std::isnan(w)) continue;
         double tg = g + w;
-        double tf = tg + gh.heuristic(to, goal);
+        double tf = tg + h_weight * gh.heuristic(to, goal);
         int o = owner(to);
         if (o == rank) {
           relax_local_owned(to, tg, tf, v);
@@ -208,7 +290,7 @@ struct DistState {
       auto [to, w] = nbr[(size_t)i];
       if (!(w >= 0.0) || std::isnan(w)) continue;
       double tg = g + w;
-      double tf = tg + gh.heuristic(to, goal);
+      double tf = tg + h_weight * gh.heuristic(to, goal);
       int tid = omp_get_thread_num();
       int o = owner(to);
       if (o == rank) {
@@ -233,7 +315,7 @@ struct DistState {
     }
   }
 
-  void apply_messages(const std::vector<RelaxMsg>& in) {
+  void apply_messages_critical(const std::vector<RelaxMsg>& in) {
     const size_t n = in.size();
     if (n == 0) return;
 #pragma omp parallel for schedule(static)
@@ -253,6 +335,49 @@ struct DistState {
     }
   }
 
+  void apply_messages_localpq_merge(const std::vector<RelaxMsg>& in) {
+    const size_t n = in.size();
+    if (n == 0) return;
+    const int nt = std::max(1, omp_get_max_threads());
+    std::vector<OpenQueue> local;
+    local.reserve((size_t)nt);
+    for (int t = 0; t < nt; t++) local.emplace_back(heap_mode);
+
+#pragma omp parallel for schedule(static)
+    for (ptrdiff_t i = 0; i < static_cast<ptrdiff_t>(n); i++) {
+      const RelaxMsg& m = in[(size_t)i];
+      if (owner(m.v) != rank) continue;
+      const int tid = omp_get_thread_num();
+      bool accept = false;
+#pragma omp critical(distastar_relax_gbest)
+      {
+        auto it = gbest.find(m.v);
+        if (it != gbest.end() && !(m.g < it->second)) {
+        } else {
+          gbest[m.v] = m.g;
+          accept = true;
+        }
+      }
+      if (accept) {
+        local[(size_t)tid].emplace(m.f, m.g, m.v);
+      }
+    }
+
+    for (int t = 0; t < nt; t++) {
+      while (!local[(size_t)t].empty()) {
+        const OpenEl& e = local[(size_t)t].top();
+        open.push(e);
+        local[(size_t)t].pop();
+      }
+    }
+    // Goal detection will happen as OPEN elements are popped (also handled by maybe_found on local relaxes).
+  }
+
+  void apply_messages(const std::vector<RelaxMsg>& in) {
+    if (inbox_mode == InboxMode::Critical) return apply_messages_critical(in);
+    return apply_messages_localpq_merge(in);
+  }
+
   int run_superstep() {
     int pops = 0;
     for (auto& v : mail) v.clear();
@@ -268,6 +393,7 @@ struct DistState {
       expand_one(v, g);
       if (found) break;
     }
+    expansion_total += static_cast<uint64_t>(pops);
 
     // Exchange messages (bytes).
     std::vector<int> sbytes((size_t)nranks, 0);
@@ -286,8 +412,8 @@ struct DistState {
       if (r > 0) rdis[(size_t)r] = rdis[(size_t)r - 1] + rbytes[(size_t)r - 1];
     }
 
-    std::vector<char> sbuf((size_t)std::max(1, ssum));
-    std::vector<char> rbuf((size_t)std::max(1, rsum));
+    AlignedBuf sbuf((size_t)std::max(1, ssum));
+    AlignedBuf rbuf((size_t)std::max(1, rsum));
     for (int r = 0; r < nranks; r++) {
       if (sbytes[(size_t)r] > 0) {
         std::memcpy(sbuf.data() + sdis[(size_t)r], mail[(size_t)r].data(), (size_t)sbytes[(size_t)r]);
@@ -333,7 +459,7 @@ struct DistState {
   std::optional<double> run(uint64_t start) {
     if (owner(start) == rank) {
       double hg = gh.heuristic(start, goal);
-      relax_local_owned(start, 0.0, hg, start);
+      relax_local_owned(start, 0.0, h_weight * hg, start);
     }
 
     for (uint64_t step = 0; step < max_supersteps; step++) {
@@ -359,6 +485,9 @@ int main(int argc, char** argv) {
     uint64_t start = 0, goal = 0;
     int budget = 128;
     uint64_t maxss = 50000000ULL;
+    double h_weight = 1.0;
+    DistState::HeapMode heap_mode = DistState::HeapMode::Stl;
+    DistState::InboxMode inbox_mode = DistState::InboxMode::Critical;
 
     for (int i = 1; i < argc; i++) {
       const char* a = argv[i];
@@ -366,6 +495,18 @@ int main(int argc, char** argv) {
       else if (!std::strcmp(a, "--edges") || !std::strcmp(a, "--spec")) path = argv[++i];
       else if (!std::strcmp(a, "--start")) start = parse_u64(argv[++i]);
       else if (!std::strcmp(a, "--goal")) goal = parse_u64(argv[++i]);
+      else if (!std::strcmp(a, "-w")) h_weight = parse_double_arg(argv[++i]);
+      else if (!std::strcmp(a, "--heap")) {
+        const char* v = argv[++i];
+        if (!std::strcmp(v, "stl")) heap_mode = DistState::HeapMode::Stl;
+        else if (!std::strcmp(v, "4ary")) heap_mode = DistState::HeapMode::Dary4;
+        else throw std::runtime_error("bad --heap (stl|4ary)");
+      } else if (!std::strcmp(a, "--inbox")) {
+        const char* v = argv[++i];
+        if (!std::strcmp(v, "critical")) inbox_mode = DistState::InboxMode::Critical;
+        else if (!std::strcmp(v, "localpq")) inbox_mode = DistState::InboxMode::LocalPQMerge;
+        else throw std::runtime_error("bad --inbox (critical|localpq)");
+      }
       else if (!std::strcmp(a, "--budget")) budget = (int)parse_u64(argv[++i]);
       else if (!std::strcmp(a, "--max-supersteps")) maxss = parse_u64(argv[++i]);
       else if (!std::strcmp(a, "-h") || !std::strcmp(a, "--help")) {
@@ -402,16 +543,22 @@ int main(int argc, char** argv) {
       if (goal >= gh.csr->n || start >= gh.csr->n) throw std::runtime_error("start/goal out of range");
     }
 
-    DistState st(rank, nranks, std::move(gh), goal, budget, maxss);
+    DistState st(rank, nranks, std::move(gh), goal, budget, maxss, h_weight, heap_mode, inbox_mode);
     auto cost = st.run(start);
     auto t1 = std::chrono::steady_clock::now();
     double sec = std::chrono::duration<double>(t1 - t0).count();
 
+    unsigned long long lexp = st.expansion_total;
+    unsigned long long gexp = 0;
+    MPI_Reduce(&lexp, &gexp, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+
     if (rank == 0) {
       if (!cost.has_value()) {
-        std::printf("no_path time_s=%.6f ranks=%d threads=%d\n", sec, nranks, omp_get_max_threads());
+        std::printf("no_path w_astar=%.6g expansions=%llu time_s=%.6f ranks=%d threads=%d\n", h_weight,
+                     gexp, sec, nranks, omp_get_max_threads());
       } else {
-        std::printf("cost=%.12g time_s=%.6f ranks=%d threads=%d\n", *cost, sec, nranks, omp_get_max_threads());
+        std::printf("cost=%.12g w_astar=%.6g expansions=%llu time_s=%.6f ranks=%d threads=%d\n", *cost,
+                    h_weight, gexp, sec, nranks, omp_get_max_threads());
       }
     }
 

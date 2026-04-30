@@ -1,0 +1,5 @@
+graph	w	time_s	expansions	cost	line
+grid_1e9_sparse	1	274.676186	1000000000	69998	cost=69998 w_astar=1 expansions=1000000000 time_s=274.676186 grid_w=50000 grid_h=20000
+grid_1e9_sparse	5	0.024381	69999	69998	cost=69998 w_astar=5 expansions=69999 time_s=0.024381 grid_w=50000 grid_h=20000
+recommender_medium	1	340.778480	10905494	0.559949941671	cost=0.559949941671 w_astar=1 expansions=10905494 time_s=340.778480 n=1000000000
+recommender_medium	5	292.595413	10731422	0.816231404067	cost=0.816231404067 w_astar=5 expansions=10731422 time_s=292.595413 n=1000000000
