@@ -48,6 +48,7 @@ static void usage(const char* argv0) {
                "Optional:\n"
                "  --heap  stl|4ary            (default: 4ary)\n"
                "  --inbox critical|localpq|sharded    (default: sharded)\n"
+               "  --budget B                  (default: 256 expansions per superstep)\n"
                "Notes:\n"
                "  - Reuses thread-local neighbor staging (no per-expand nested vector alloc).\n"
                "  - `sharded` partitions inbound relaxations by v%%nt so gbest/open updates avoid\n"
@@ -221,7 +222,8 @@ struct DistState {
       throw std::runtime_error("h_weight (-w) must be finite and > 0");
     }
     mail.assign((size_t)nranks, {});
-    gbest.reserve(1024);
+    for (auto& mb : mail) mb.reserve(16384);
+    gbest.reserve(1u << 20);
     nbr.reserve(4096);
     inbox_work.reserve(4096);
     shard_buf.reserve(4096);
@@ -268,7 +270,8 @@ struct DistState {
 
     gh.neighbors(v, nbr);
     const int deg = static_cast<int>(nbr.size());
-    const int use_omp = (deg >= 32 && omp_get_max_threads() > 1) ? 1 : 0;
+    // kNN geom workloads often have deg≈k (e.g. 64): parallelize neighbor scoring from 16+ edges.
+    const int use_omp = (deg >= 16 && omp_get_max_threads() > 1) ? 1 : 0;
 
     if (!use_omp) {
       for (auto [to, w] : nbr) {
@@ -597,7 +600,7 @@ int main(int argc, char** argv) {
     std::string mode_str;
     std::string path;
     uint64_t start = 0, goal = 0;
-    int budget = 128;
+    int budget = 256;
     uint64_t maxss = 50000000ULL;
     double h_weight = 1.0;
     DistState::HeapMode heap_mode = DistState::HeapMode::Dary4;
