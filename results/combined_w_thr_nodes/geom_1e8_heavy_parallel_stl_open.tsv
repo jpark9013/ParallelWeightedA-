@@ -1,0 +1,4 @@
+bin	threads	time_s	expansions	cost
+astar_mpi_geompar_stl	1	101.716861	111863	0.855400220879
+astar_mpi_geompar_stl	8	70.021066	111863	0.855400220879
+astar_mpi_geompar_stl	64	76.493848	111863	0.855400220879

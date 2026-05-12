@@ -1,0 +1,3 @@
+variant	binary	time_s	expansions	cost	note
+baseline	astar_mpi	148.786790	10906240	0.559949941671	same as nodes_1_2_4 row 2n1t
+donation_steal	astar_mpi_geom_lb_steal	158.385259	10906230	0.559949941671	--owner auto --donate 1 --donate-max 4096

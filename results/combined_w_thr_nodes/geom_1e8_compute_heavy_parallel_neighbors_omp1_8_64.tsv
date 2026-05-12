@@ -1,0 +1,4 @@
+graph_binary	spec	n	w	threads	time_s	expansions	cost	speedup_vs_1
+astar_mpi_geompar_stl	geom_1e8_compute_heavy_parallel_neighbors.spec	1	1	1	39.544313	284435	0.855760737424	1.000
+astar_mpi_geompar_stl	geom_1e8_compute_heavy_parallel_neighbors.spec	1	1	8	30.041886	284435	0.855760737424	1.317
+astar_mpi_geompar_stl	geom_1e8_compute_heavy_parallel_neighbors.spec	1	1	64	41.662893	284435	0.855760737424	0.949

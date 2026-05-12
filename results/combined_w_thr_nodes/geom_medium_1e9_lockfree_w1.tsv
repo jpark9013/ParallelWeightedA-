@@ -1,0 +1,5 @@
+graph	nodes	w	threads	time_s	exit_code	expansions	cost
+recommender_medium_lf	1	1	1	253.651259	0	10905493	0.559949941671
+recommender_medium_lf	1	1	8	310.944363	0	10905493	0.559949941671
+recommender_medium_lf	2	1	1	149.715327	0	10906240	0.559949941671
+recommender_medium_lf	2	1	8	208.219314	0	10906240	0.559949941671

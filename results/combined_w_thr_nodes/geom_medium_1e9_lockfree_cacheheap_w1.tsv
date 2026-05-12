@@ -1,0 +1,5 @@
+graph	nodes	w	threads	time_s	exit_code	expansions	cost
+recommender_medium_lf_cacheheap	1	1	1	256.802433	0	10905493	0.559949941671
+recommender_medium_lf_cacheheap	1	1	8	311.342252	0	10905493	0.559949941671
+recommender_medium_lf_cacheheap	2	1	1	150.066648	0	10906240	0.559949941671
+recommender_medium_lf_cacheheap	2	1	8	208.760153	0	10906240	0.559949941671

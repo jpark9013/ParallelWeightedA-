@@ -1,0 +1,4 @@
+graph	spec	mode	instrument	nodes	ranks	threads	w	time_s	expansions	exit_code	notes
+geom_1e9_recommender_medium	bench_specs/geom_1e9_recommender_medium.spec	geom	serial_default	1	1	1	1	327.394607	10905494	0	compute node (nid004171); omp_threads irrelevant (serial has no OpenMP)
+geom_1e9_recommender_medium	bench_specs/geom_1e9_recommender_medium.spec	geom	astar_mpi_fast	1	1	8	1	287.047121	10905493	0	salloc + srun -n1 -c128 cpu-bind=cores; OMP_NUM_THREADS=8
+geom_1e9_recommender_medium	bench_specs/geom_1e9_recommender_medium.spec	geom	serial_default_login	1	1	1	1	352.670636	10905494	0	optional: same binary on login node before compute rerun (different CPU load)

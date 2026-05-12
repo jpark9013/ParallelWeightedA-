@@ -1,0 +1,4 @@
+bin	threads	time_s	expansions	cost
+astar_mpi_lf_cache_geompar	1	102.123977	111863	0.855400220879
+astar_mpi_lf_cache_geompar	8	70.425729	111863	0.855400220879
+astar_mpi_lf_cache_geompar	64	76.873812	111863	0.855400220879

@@ -1,0 +1,3 @@
+instrument	time_s	expansions
+Serial	327.394607	10905494
+MPI fast OMP=8	287.047121	10905493
