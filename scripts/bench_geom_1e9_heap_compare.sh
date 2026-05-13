@@ -56,7 +56,7 @@ HEAPS="${HEAPS:-stl 4ary}"
 RPN_LIST="${RPN_LIST:-1 8 128}"
 
 # Number of repeated trials per config
-REPEATS="${REPEATS:-3}"
+REPEATS="${REPEATS:-1}"
 
 # Pinning / placement
 CPU_BIND="${CPU_BIND:-cores}"

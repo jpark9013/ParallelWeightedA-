@@ -1,0 +1,2 @@
+srun: Job step's --cpus-per-task value exceeds that of job (32 > 1). Job step may never run.
+cost=0.559949941671 w_astar=1 expansions=10905493 time_s=396.108815 ranks=1 threads=32
