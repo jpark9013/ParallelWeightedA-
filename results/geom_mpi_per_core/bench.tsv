@@ -1,0 +1,4 @@
+stamp	variant	nodes	mpi_ranks	omp_threads	cpus_per_task	time_s	expansions	cost	rc	line
+2026-05-12T16:31:46-07:00	mpi_per_core	1	1	1	1	261.758010	10905493	0.559949941671	0	cost=0.559949941671 w_astar=1 expansions=10905493 time_s=261.758010 ranks=1 threads=1
+2026-05-12T16:31:46-07:00	mpi_per_core	1	8	1	1	43.742484	10903680	0.559949941671	0	cost=0.559949941671 w_astar=1 expansions=10903680 time_s=43.742484 ranks=8 threads=1
+2026-05-12T16:31:46-07:00	mpi_per_core	1	128	1	1	4.628294	10944793	0.559949941671	0	cost=0.559949941671 w_astar=1 expansions=10944793 time_s=4.628294 ranks=128 threads=1

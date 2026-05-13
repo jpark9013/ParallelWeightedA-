@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="520" viewBox="0 0 860 520">
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="430" y="28" text-anchor="middle" font-size="15" font-family="sans-serif">Geom recommender medium n=1e9, w=1 — MPI scaling (cores/node, log time)</text>
+  <text x="430" y="500" text-anchor="middle" font-size="11" fill="#555" font-family="sans-serif">Ideal: T(1)/c and T(2)/c (c = cores per node)</text>
+  <line x1="80.00" y1="50.0" x2="80.00" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="80.00" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">1</text>
+  <line x1="177.14" y1="50.0" x2="177.14" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="177.14" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">2</text>
+  <line x1="274.29" y1="50.0" x2="274.29" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="274.29" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">4</text>
+  <line x1="371.43" y1="50.0" x2="371.43" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="371.43" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">8</text>
+  <line x1="468.57" y1="50.0" x2="468.57" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="468.57" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">16</text>
+  <line x1="565.71" y1="50.0" x2="565.71" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="565.71" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">32</text>
+  <line x1="662.86" y1="50.0" x2="662.86" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="662.86" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">64</text>
+  <line x1="760.00" y1="50.0" x2="760.00" y2="450.0" stroke="#ddd" stroke-width="1"/>
+  <text x="760.00" y="472" text-anchor="middle" font-size="10" fill="#333" font-family="sans-serif">128</text>
+  <line x1="80.0" y1="570.41" x2="760.0" y2="570.41" stroke="#eee" stroke-width="1"/>
+  <text x="72" y="574.41" text-anchor="end" font-size="10" fill="#333" font-family="sans-serif">1</text>
+  <line x1="80.0" y1="370.41" x2="760.0" y2="370.41" stroke="#eee" stroke-width="1"/>
+  <text x="72" y="374.41" text-anchor="end" font-size="10" fill="#333" font-family="sans-serif">10</text>
+  <line x1="80.0" y1="170.41" x2="760.0" y2="170.41" stroke="#eee" stroke-width="1"/>
+  <text x="72" y="174.41" text-anchor="end" font-size="10" fill="#333" font-family="sans-serif">100</text>
+  <text x="430" y="475" text-anchor="middle" font-size="12" font-family="sans-serif"># of cores used per node (1 rank : 1 core)</text>
+  <text transform="translate(22,280) rotate(-90)" text-anchor="middle" font-size="12" font-family="sans-serif">time (s)</text>
+  <path d="M 80.00 86.63 L 177.14 118.70 L 274.29 180.69 L 371.43 242.38 L 468.57 272.21 L 565.71 327.85 L 662.86 374.68 L 760.00 436.62" fill="none" stroke="#4C72B0" stroke-width="2.5"/>
+  <circle cx="80.00" cy="86.63" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="177.14" cy="118.70" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="274.29" cy="180.69" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="371.43" cy="242.38" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="468.57" cy="272.21" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="565.71" cy="327.85" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="662.86" cy="374.68" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <circle cx="760.00" cy="436.62" r="5" fill="#4C72B0" stroke="#222" stroke-width="0.5"/>
+  <path d="M 80.00 142.40 L 177.14 178.83 L 274.29 239.84 L 371.43 267.98 L 468.57 321.22 L 565.71 363.91 L 662.86 391.61 L 760.00 394.24" fill="none" stroke="#DD8452" stroke-width="2.5"/>
+  <circle cx="80.00" cy="142.40" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="177.14" cy="178.83" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="274.29" cy="239.84" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="371.43" cy="267.98" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="468.57" cy="321.22" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="565.71" cy="363.91" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="662.86" cy="391.61" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <circle cx="760.00" cy="394.24" r="5" fill="#DD8452" stroke="#222" stroke-width="0.5"/>
+  <path d="M 80.00 86.63 L 177.14 146.84 L 274.29 207.04 L 371.43 267.25 L 468.57 327.46 L 565.71 387.66 L 662.86 447.87 L 760.00 508.07" fill="none" stroke="#4C72B0" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.75"/>
+  <path d="M 80.00 142.40 L 177.14 202.60 L 274.29 262.81 L 371.43 323.01 L 468.57 383.22 L 565.71 443.42 L 662.86 503.63 L 760.00 563.84" fill="none" stroke="#DD8452" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.75"/>
+  <rect x="600" y="58" width="220" height="88" fill="white" stroke="#ccc"/>
+  <text x="612" y="78" font-size="11" font-family="sans-serif" fill="#4C72B0">● 1 node (measured)</text>
+  <text x="612" y="96" font-size="11" font-family="sans-serif" fill="#4C72B0">- - ideal T(1)/c</text>
+  <text x="612" y="114" font-size="11" font-family="sans-serif" fill="#DD8452">■ 2 nodes (measured)</text>
+  <text x="612" y="132" font-size="11" font-family="sans-serif" fill="#DD8452">- - ideal T(2)/c</text>
+</svg>

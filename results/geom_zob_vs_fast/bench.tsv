@@ -1,0 +1,4 @@
+stamp	variant	nodes	mpi_ranks	omp_threads	cpus_per_task	time_s	expansions	cost	rc	line
+2026-05-12T15:28:21-07:00	fast	1	1	1	8	261.999696	10905493	0.559949941671	0	cost=0.559949941671 w_astar=1 expansions=10905493 time_s=261.999696 ranks=1 threads=1
+2026-05-12T15:28:21-07:00	zob_pq	1	1	1	8	312.141904	10905493	0.559949941671	0	cost=0.559949941671 variant=zob_pq w_astar=1 expansions=10905493 time_s=312.141904 ranks=1 threads=1
+2026-05-12T15:28:21-07:00	fast	1	1	8	8	298.226349	10905493	0.559949941671	0	cost=0.559949941671 w_astar=1 expansions=10905493 time_s=298.226349 ranks=1 threads=8
